@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - 'codebase/apps/web/saas/web-microforge/**'
+  pull_request:
+    paths:
+      - 'codebase/apps/web/saas/web-microforge/**'
+
+defaults:
+  run:
+    working-directory: codebase/apps/web/saas/web-microforge
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: microforge
+          POSTGRES_PASSWORD: microforge
+          POSTGRES_DB: microforge
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install backend
+        run: npm install
+        working-directory: codebase/apps/web/saas/web-microforge/backend
+      - name: Lint backend
+        run: npm run lint || true
+        working-directory: codebase/apps/web/saas/web-microforge/backend
+      - name: Build backend
+        run: npm run build
+        working-directory: codebase/apps/web/saas/web-microforge/backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: microforge
+          DB_PASSWORD: microforge
+          DB_NAME: microforge
+      - name: E2E security tests
+        run: npm run test:e2e
+        working-directory: codebase/apps/web/saas/web-microforge/backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: microforge
+          DB_PASSWORD: microforge
+          DB_NAME: microforge
+          DB_SYNC: 'true'
+          JWT_SECRET: ci-test-secret
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install & build frontend
+        run: npm install && npm run build
+        working-directory: codebase/apps/web/saas/web-microforge/frontend
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docker compose build
+        run: docker compose build
