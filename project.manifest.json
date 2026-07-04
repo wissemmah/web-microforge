@@ -1,0 +1,37 @@
+{
+  "name": "web-microforge",
+  "type": "app",
+  "platform": "web",
+  "domain": "saas",
+  "framework": "react-vite-nestjs",
+  "packageManager": "npm",
+  "stack": {
+    "frontend": "React 18 + Vite + Tailwind + React Router",
+    "backend": "NestJS 10 + TypeORM",
+    "database": "PostgreSQL 16",
+    "deploy": "Docker Compose"
+  },
+  "commands": {
+    "install": "./install.sh",
+    "dev_backend": "cd backend && npm run start:dev",
+    "dev_frontend": "cd frontend && npm run dev",
+    "build": "docker compose build",
+    "start": "docker compose up -d",
+    "stop": "docker compose down",
+    "test": "cd backend && npm run test:e2e",
+    "lint": "cd backend && npm run lint"
+  },
+  "entrypoints": {
+    "web": "http://localhost:8080",
+    "api": "http://localhost:3000/api/health"
+  },
+  "integrations": ["JWT Auth", "PostgreSQL", "Docker"],
+  "roles": ["CLIENT", "WORKER", "REVIEWER", "ADMIN"],
+  "definitionOfDone": [
+    "docker compose up démarre frontend + API + Postgres",
+    "Seed demo jobs/tâches/comptes",
+    "RBAC enforced backend + frontend",
+    "Tests e2e sécurité passent",
+    "Build frontend OK"
+  ]
+}

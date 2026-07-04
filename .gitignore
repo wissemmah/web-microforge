@@ -1,0 +1,29 @@
+# Secrets — ne jamais committer
+.env
+.env.local
+.env.*.local
+
+# Dépendances & builds
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Logs & OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Docker volumes locaux (si montés)
+storage/
+
+# Test / cache
+.jest/
+.eslintcache
